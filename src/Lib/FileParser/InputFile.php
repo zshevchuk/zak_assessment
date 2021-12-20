@@ -19,9 +19,6 @@ class InputFile extends File
         $this->validateFileExists();
     }
 
-    /**
-     * @param $filePath
-     */
     public function validateFileExists(): void
     {
         if (!file_exists($this->filePath)) {

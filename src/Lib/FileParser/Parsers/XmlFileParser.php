@@ -4,15 +4,20 @@ namespace App\Lib\FileParser\Parsers;
 
 use App\Lib\FileParser\Contracts\FileParser;
 use App\Lib\FileParser\Abstracts\File;
-use App\Lib\FileParser\Line;
-use App\Lib\FileParser\ResultData;
+use App\Lib\FileParser\LogLine;
+use App\Lib\FileParser\LogDataProcessor;
 
 class XmlFileParser implements FileParser
 {
-    public function parse(File $file, ResultData $resultData)
+    public function parse(File $file, LogDataProcessor $resultData): bool
     {
         $xml = new \XMLReader();
-        $xml->open($file->getFilePath());
+
+        if (!$xml->open($file->getFilePath())) {
+            return false;
+        }
+
+        $atLeastOneIteration = false;
 
         // move to the first <record/> node
         while ($xml->read() && $xml->name !== 'record');
@@ -23,11 +28,15 @@ class XmlFileParser implements FileParser
             $personId = (string)$element['person']->attributes()['id'];
             $actionType = (string)$element['action']->attributes()['type'];
 
-            $line = new Line(timestamp: $element['timestamp'], personId: $personId, bookId: $element['isbn'], actionType: $actionType);
-            $resultData->feedLine($line);
+            $line = new LogLine(timestamp: $element['timestamp'], personId: $personId, bookId: $element['isbn'], actionType: $actionType);
 
+            $resultData->iterateOverLine($line);
+
+            $atLeastOneIteration = true;
             $xml->next('record');
         }
+
+        return $atLeastOneIteration;
     }
 
 }

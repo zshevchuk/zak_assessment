@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 use App\Lib\FileParser\InputFile;
 use App\Lib\FileParser\OutputFile;
 use App\Lib\FileParser\ParserFactory;
-use App\Lib\FileParser\ResultData;
+use App\Lib\FileParser\LogDataProcessor;
 
 class FileParserCommand extends Command
 {
@@ -37,7 +37,7 @@ class FileParserCommand extends Command
         $inputFilesPaths = $input->getArgument('input_files');
         $outputFilePath = $input->getOption('output_file');
 
-        $resultData = new ResultData();
+        $resultData = new LogDataProcessor();
 
         foreach ($inputFilesPaths as $inputFilesPath) {
             $file = new InputFile($inputFilesPath);
@@ -58,6 +58,7 @@ class FileParserCommand extends Command
         $renderer = RenderedFactory::create($resultFile);
 
         $io->text('Rendering an output file');
+
         if (!$renderer->render($result)) {
             throw new \Exception('Could not render output file');
         }

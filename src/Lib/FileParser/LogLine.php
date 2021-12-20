@@ -2,7 +2,9 @@
 
 namespace App\Lib\FileParser;
 
-final class Line
+use App\Lib\FileParser\Contracts\Line;
+
+final class LogLine implements Line
 {
     public int $personId;
     public string $bookId;

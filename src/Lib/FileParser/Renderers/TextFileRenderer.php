@@ -3,7 +3,6 @@
 namespace App\Lib\FileParser\Renderers;
 
 use App\Lib\FileParser\Contracts\Renderer;
-use App\Lib\FileParser\ResultData;
 
 class TextFileRenderer extends FileRenderer implements Renderer
 {
