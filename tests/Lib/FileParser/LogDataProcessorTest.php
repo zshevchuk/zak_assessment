@@ -2,7 +2,9 @@
 
 namespace App\Tests\Lib\FileParser;
 
+use App\Lib\FileParser\Enums\LogEnum;
 use App\Lib\FileParser\LogDataProcessor;
+use App\Lib\FileParser\LogLine;
 
 class LogDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -59,4 +61,16 @@ class LogDataProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals($expected, $this->LogDataProcessor->findKeysOfTheMaxValue($data));
     }
+
+    public function testProcessorIsInitializedAfterComputingALine()
+    {
+        // make sure it wasn't initialized at the beginning
+        $this->assertFalse($this->LogDataProcessor->isInitialized());
+
+        $line = new LogLine('1994-31-12', 999, 'book_id', LogEnum::CHECK_OUT);
+
+        $this->LogDataProcessor->iterateOverLine($line);
+        $this->assertTrue($this->LogDataProcessor->isInitialized());
+    }
+
 }

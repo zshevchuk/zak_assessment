@@ -35,7 +35,7 @@ class LogDataProcessor implements DataProcessor, LineIterator
         $actionType = $data['actionType'];
 
         /**
-         * which person has the most checkouts (which person_id)**
+         * Which person has the most checkouts (which person_id)**
          */
         if ($actionType === LogEnum::CHECK_OUT) {
             if (isset($this->peopleHashMap[$personId])) {
@@ -48,7 +48,7 @@ class LogDataProcessor implements DataProcessor, LineIterator
         }
 
         /**
-         *  how many books are checked out at this moment
+         * How many books are checked out at this moment
          */
         if (isset($this->booksCheckoutMap[$bookId])) {
             unset($this->booksCheckoutMap[$bookId]);
@@ -57,7 +57,7 @@ class LogDataProcessor implements DataProcessor, LineIterator
         }
 
         /**
-         * which book was checked out the longest time in total (summed up over all
+         * Which book was checked out the longest time in total (summed up over all
          * transactions)
          */
         $this->booksTransactionTimeMap[$bookId][] = $bookTimestamp;
@@ -83,18 +83,24 @@ class LogDataProcessor implements DataProcessor, LineIterator
         ];
     }
 
+    /**
+     * Return id(s) of the person(people if same amount) with most checkout
+     */
     public function getPersonWithMostCheckouts(): array
     {
         return $this->findKeysOfTheMaxValue($this->peopleHashMap);
     }
 
+    /**
+     * Return count of currently check outed books
+     */
     public function getCurrentCheckoutedBooksCount(): int
     {
         return count($this->booksCheckoutMap);
     }
 
     /**
-     *  which book was checked out the longest time in total (summed up over all
+     * Which book was checked out the longest time in total (summed up over all
      * transactions)
      */
     public function getBookWithLongestCheckoutTime(): array
@@ -120,6 +126,9 @@ class LogDataProcessor implements DataProcessor, LineIterator
     }
 
 
+    /**
+     * Return person(s) id with most books checked out at the moment
+     */
     public function getPersonWithMostBooks(): array
     {
         $countOfBooksPerPerson = [];
