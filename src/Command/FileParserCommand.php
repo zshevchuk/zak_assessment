@@ -1,6 +1,7 @@
 <?php
 namespace App\Command;
 
+use App\Lib\FileParser\Contracts\DataProcessor;
 use App\Lib\FileParser\RenderedFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,6 +19,7 @@ class FileParserCommand extends Command
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'zak:parse';
+    private SymfonyStyle $io;
 
     protected function configure(): void
     {
@@ -30,13 +32,37 @@ class FileParserCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $io = $this->io = new SymfonyStyle($input, $output);
 
-        $io->section('Parsing input file(s)');
+        try {
+            $inputFilesPaths = $input->getArgument('input_files');
+            $outputFilePath = $input->getOption('output_file');
 
-        $inputFilesPaths = $input->getArgument('input_files');
-        $outputFilePath = $input->getOption('output_file');
+            $analyzedData = $this->parseInputs($inputFilesPaths);
 
+            $this->io->text('Crunching numbers');
+
+            $result = $analyzedData->response();
+
+            $this->io->section('Preparing a result');
+            $this->io->text('Rendering an output file');
+            $this->renderResultFile($outputFilePath, $result);
+
+            $io->title(sprintf('Data has been processed, you can find a result in %s/%s', OutputFile::$folder, $outputFilePath));
+            return Command::SUCCESS;
+        } catch (\Exception $e) {
+            $io->error($e->getMessage());
+
+            return Command::FAILURE;
+        }
+    }
+
+    /**
+     * Gather information from files and prepare it for render
+     */
+    protected function parseInputs(array $inputFilesPaths): DataProcessor
+    {
+        $this->io->section('Parsing input file(s)');
         $resultData = new LogDataProcessor();
 
         foreach ($inputFilesPaths as $inputFilesPath) {
@@ -47,30 +73,31 @@ class FileParserCommand extends Command
             $parsed = $fileParser->parse($file, $resultData);
 
             if (!$parsed) {
-                $io->text('An error has occurred while parsing: ' . $inputFilesPath );
+                $this->io->text('An error has occurred while parsing: ' . $inputFilesPath);
                 continue;
             }
 
-            $io->text($inputFilesPath . ' was parsed');
+            $this->io->text($inputFilesPath . ' was parsed');
         }
 
-        $io->section('Preparing a result');
-
-        $io->text('Crunching numbers');
-        $result = $resultData->response();
-
-        $resultFile = new OutputFile($outputFilePath);
-        $renderer = RenderedFactory::create($resultFile);
-
-        $io->text('Rendering an output file');
-
-        if (!$renderer->render($result)) {
-            throw new \Exception('Could not render output file');
+        if (!$resultData->isInitialized()) {
+            throw new \Exception('No data was gather from files');
         }
 
-        $io->title(sprintf('Data has been processed, you can find a result in %s/%s', OutputFile::$folder, $outputFilePath));
-        return Command::FAILURE;
+        return $resultData;
     }
+
+    /**
+     * Gets corresponding renderer and tries to render an output file
+     */
+    protected function renderResultFile($outputFilePath, $analyzedData): void
+    {
+        $resultFile = new OutputFile($outputFilePath);
+
+        RenderedFactory::create($resultFile)
+            ->render($analyzedData);
+    }
+
 }
 
 

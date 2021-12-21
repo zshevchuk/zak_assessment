@@ -17,9 +17,9 @@ abstract class FileRenderer implements Renderer
 
     abstract function format(array $data);
 
-    public function render(array $data)
+    public function render(array $data):void
     {
-        $file = fopen($this->file->getExtension(), 'w');
+        $file = fopen($this->file->getPathname(), 'w');
 
         if (!$file) {
             throw new \Exception('Could not open output folder');
@@ -27,7 +27,9 @@ abstract class FileRenderer implements Renderer
 
         $output = $this->format($data);
 
-        return (bool)fwrite($file, $output);
+        if (!fwrite($file, $output)) {
+            throw new \Exception('Could not write into output file');
+        }
     }
 
 }

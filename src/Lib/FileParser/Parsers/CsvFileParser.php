@@ -12,7 +12,7 @@ class CsvFileParser implements FileParser
     public function parse(File $file, LogDataProcessor $resultData): bool
     {
         $row = 0;
-        $import = fopen($file->getPath(), 'r');
+        $import = fopen($file->getPathname(), 'r');
 
         if (!$import) {
             return false;

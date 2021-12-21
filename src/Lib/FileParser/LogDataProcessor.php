@@ -13,6 +13,18 @@ class LogDataProcessor implements DataProcessor, LineIterator
     public array $booksCheckoutMap = [];
     public array $booksTransactionTimeMap = [];
 
+    public bool $initialized = false;
+
+    public function initialize(): void
+    {
+        $this->initialized = true;
+    }
+
+    public function isInitialized(): bool
+    {
+        return $this->initialized === true;
+    }
+
     public function iterateOverLine(Line $line): void
     {
         $data = (array)$line;
@@ -49,6 +61,8 @@ class LogDataProcessor implements DataProcessor, LineIterator
          * transactions)
          */
         $this->booksTransactionTimeMap[$bookId][] = $bookTimestamp;
+
+        $this->initialize();
     }
 
     /**
@@ -127,7 +141,7 @@ class LogDataProcessor implements DataProcessor, LineIterator
     public function findKeysOfTheMaxValue(array $data): array
     {
         // extract element key with a max value
-        // due to https://wiki.php.net/rfc/string_to_number_comparison we cannot just use max() safely to find biggest elemnt
+        // due to https://wiki.php.net/rfc/string_to_number_comparison we cannot just use max() safely to find biggest element
         $keys = [];
         $max = 0;
 
@@ -144,5 +158,6 @@ class LogDataProcessor implements DataProcessor, LineIterator
 
         return $keys;
     }
+
 }
 
