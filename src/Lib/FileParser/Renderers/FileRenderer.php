@@ -18,7 +18,7 @@ abstract class FileRenderer implements Renderer
 
     public function render(array $data)
     {
-        $file = fopen($this->file->getFileExtension(), 'w');
+        $file = fopen($this->file->getExtension(), 'w');
 
         if (!$file) {
             throw new \Exception('Could not open output folder');

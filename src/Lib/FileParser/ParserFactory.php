@@ -9,7 +9,8 @@ class ParserFactory
 {
     public static function create(File $file): FileParser
     {
-        $extension = pathinfo($file->getFilePath(), PATHINFO_EXTENSION);
+        $extension = $file->getExtension();
+
         $parserClass = ucfirst($extension) . 'FileParser';
         $namespaced = sprintf(__NAMESPACE__ . "\\Parsers\\%s", $parserClass);
 

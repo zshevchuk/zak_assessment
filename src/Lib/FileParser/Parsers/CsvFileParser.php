@@ -12,13 +12,16 @@ class CsvFileParser implements FileParser
     public function parse(File $file, LogDataProcessor $resultData): bool
     {
         $row = 0;
-        $import = fopen($file->getFilePath(), 'r');
+        $import = fopen($file->getPath(), 'r');
 
         if (!$import) {
             return false;
         }
 
         while ($data = fgetcsv($import)) {
+            if (!$data) {
+                return false;
+            }
             $row++;
 
             // skip header row

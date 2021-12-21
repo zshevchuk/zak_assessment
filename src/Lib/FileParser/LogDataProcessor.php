@@ -85,7 +85,8 @@ class LogDataProcessor implements DataProcessor, LineIterator
      */
     protected function getBookWithLongestCheckoutTime(): int|string
     {
-        $now = time();
+        $now = new \DateTime('now');
+        $now = $now->format('U');
 
         foreach ($this->booksTransactionTimeMap as &$transactions) {
             $transactionPairs = array_chunk($transactions, 2);

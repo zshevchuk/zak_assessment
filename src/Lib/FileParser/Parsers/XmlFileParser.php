@@ -11,9 +11,10 @@ class XmlFileParser implements FileParser
 {
     public function parse(File $file, LogDataProcessor $resultData): bool
     {
+        dump($file->getRealPath());
         $xml = new \XMLReader();
 
-        if (!$xml->open($file->getFilePath())) {
+        if (!$xml->open($file->getRealPath())) {
             return false;
         }
 

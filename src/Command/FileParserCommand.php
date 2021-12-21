@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Validator\Validation;
 
 use App\Lib\FileParser\InputFile;
 use App\Lib\FileParser\OutputFile;
@@ -37,14 +38,22 @@ class FileParserCommand extends Command
         $inputFilesPaths = $input->getArgument('input_files');
         $outputFilePath = $input->getOption('output_file');
 
+//        $validator = Validation::createValidator();
+
         $resultData = new LogDataProcessor();
 
         foreach ($inputFilesPaths as $inputFilesPath) {
             $file = new InputFile($inputFilesPath);
+            dump($file);
 
             $fileParser = ParserFactory::create($file);
 
-            $fileParser->parse($file, $resultData);
+            $parsed = $fileParser->parse($file, $resultData);
+
+            if (!$parsed) {
+                $io->text('An error has occurred while parsing: ' . $inputFilesPath );
+                continue;
+            }
             $io->text($inputFilesPath . ' was parsed');
         }
 

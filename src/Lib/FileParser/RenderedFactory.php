@@ -9,7 +9,8 @@ class RenderedFactory
 {
     public static function create(File $file): Renderer
     {
-        $extension = pathinfo($file->getFilePath(), PATHINFO_EXTENSION);
+        $extension = $file->getExtension();
+
         $parserClass = ucfirst($extension) . 'FileRenderer';
         $namespaced = sprintf(__NAMESPACE__ . "\\Renderers\\%s", $parserClass);
 
