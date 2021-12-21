@@ -8,7 +8,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Validator\Validation;
 
 use App\Lib\FileParser\InputFile;
 use App\Lib\FileParser\OutputFile;
@@ -26,7 +25,7 @@ class FileParserCommand extends Command
             ->setDescription('Parses xml/csv provided file(s)')
             ->setHelp('Supply 2 arguments, input file(files with comma separator) and name of output file')
             ->addArgument('input_files', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'File name or names(with space separator)')
-            ->addOption('output_file', 'o', InputOption::VALUE_REQUIRED, 'File name for a result file', OutputFile::defaultFilename());
+            ->addOption('output_file', 'o', InputOption::VALUE_REQUIRED, 'File name for a result file', OutputFile::getDefaultName());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -38,13 +37,10 @@ class FileParserCommand extends Command
         $inputFilesPaths = $input->getArgument('input_files');
         $outputFilePath = $input->getOption('output_file');
 
-//        $validator = Validation::createValidator();
-
         $resultData = new LogDataProcessor();
 
         foreach ($inputFilesPaths as $inputFilesPath) {
             $file = new InputFile($inputFilesPath);
-            dump($file);
 
             $fileParser = ParserFactory::create($file);
 
@@ -54,6 +50,7 @@ class FileParserCommand extends Command
                 $io->text('An error has occurred while parsing: ' . $inputFilesPath );
                 continue;
             }
+
             $io->text($inputFilesPath . ' was parsed');
         }
 
