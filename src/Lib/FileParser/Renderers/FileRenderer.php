@@ -9,6 +9,7 @@ abstract class FileRenderer implements Renderer
 {
     protected File $file;
 
+
     public function __construct(File $file)
     {
         $this->file = $file;

@@ -11,7 +11,6 @@ class XmlFileParser implements FileParser
 {
     public function parse(File $file, LogDataProcessor $resultData): bool
     {
-        dump($file->getRealPath());
         $xml = new \XMLReader();
 
         if (!$xml->open($file->getRealPath())) {
@@ -21,21 +20,22 @@ class XmlFileParser implements FileParser
         $atLeastOneIteration = false;
 
         // move to the first <record/> node
-        while ($xml->read() && $xml->name !== 'record');
+        while ($xml->read()) {
+            // now that we're at the right depth, hop to the next <record/> until the end of the tree
+            while ($xml->name === 'record') {
+                $element = (array)new \SimpleXMLElement($xml->readOuterXML());
+                $personId = (string)$element['person']->attributes()['id'];
+                $actionType = (string)$element['action']->attributes()['type'];
 
-        // now that we're at the right depth, hop to the next <record/> until the end of the tree
-        while ($xml->name === 'record') {
-            $element = (array)new \SimpleXMLElement($xml->readOuterXML());
-            $personId = (string)$element['person']->attributes()['id'];
-            $actionType = (string)$element['action']->attributes()['type'];
+                $line = new LogLine(timestamp: $element['timestamp'], personId: $personId, bookId: $element['isbn'], actionType: $actionType);
 
-            $line = new LogLine(timestamp: $element['timestamp'], personId: $personId, bookId: $element['isbn'], actionType: $actionType);
+                $resultData->iterateOverLine($line);
 
-            $resultData->iterateOverLine($line);
-
-            $atLeastOneIteration = true;
-            $xml->next('record');
+                $atLeastOneIteration = true;
+                $xml->next('record');
+            }
         }
+
 
         return $atLeastOneIteration;
     }

@@ -60,7 +60,6 @@ class FileParserCommand extends Command
         $result = $resultData->response();
 
         $resultFile = new OutputFile($outputFilePath);
-
         $renderer = RenderedFactory::create($resultFile);
 
         $io->text('Rendering an output file');

@@ -59,22 +59,22 @@ class LogDataProcessor implements DataProcessor, LineIterator
         $personWithMostBooks = $this->getPersonWithMostBooks();
         $bookWithLongestCheckout = $this->getBookWithLongestCheckoutTime();
         $checkoutedBooks = $this->getCurrentCheckoutedBooksCount();
-        $maxCheckOutPersonId = $this->getPersonWithMostCheckouts();
+        $maxCheckOutPeople = $this->getPersonWithMostCheckouts();
 
         return [
-            'most_check_out_person_id' => $maxCheckOutPersonId,
+            'most_check_outed_people' => $maxCheckOutPeople,
             'book_with_longest_checkout' => $bookWithLongestCheckout,
             'books_checkouted_now' => $checkoutedBooks,
             'person_with_largest_number_of_books' => $personWithMostBooks,
         ];
     }
 
-    protected function getPersonWithMostCheckouts(): int
+    public function getPersonWithMostCheckouts(): array
     {
-        return $this->findKeyOfTheMaxValue($this->peopleHashMap);
+        return $this->findKeysOfTheMaxValue($this->peopleHashMap);
     }
 
-    protected function getCurrentCheckoutedBooksCount(): int
+    public function getCurrentCheckoutedBooksCount(): int
     {
         return count($this->booksCheckoutMap);
     }
@@ -83,12 +83,12 @@ class LogDataProcessor implements DataProcessor, LineIterator
      *  which book was checked out the longest time in total (summed up over all
      * transactions)
      */
-    protected function getBookWithLongestCheckoutTime(): int|string
+    public function getBookWithLongestCheckoutTime(): array
     {
         $now = new \DateTime('now');
         $now = $now->format('U');
 
-        foreach ($this->booksTransactionTimeMap as &$transactions) {
+        foreach ($this->booksTransactionTimeMap as $key => $transactions) {
             $transactionPairs = array_chunk($transactions, 2);
             $total = 0;
 
@@ -99,14 +99,14 @@ class LogDataProcessor implements DataProcessor, LineIterator
                 $total += $endData - $startDate;
             }
 
-            $transactions = $total;
+            $output[$key] = $total;
         }
 
-        return $this->findKeyOfTheMaxValue($this->booksTransactionTimeMap);
+        return $this->findKeysOfTheMaxValue($output);
     }
 
 
-    protected function getPersonWithMostBooks(): int
+    public function getPersonWithMostBooks(): array
     {
         $countOfBooksPerPerson = [];
 
@@ -118,18 +118,31 @@ class LogDataProcessor implements DataProcessor, LineIterator
             }
         }
 
-        return $this->findKeyOfTheMaxValue($countOfBooksPerPerson);
+        return $this->findKeysOfTheMaxValue($countOfBooksPerPerson);
     }
 
-    public function findKeyOfTheMaxValue(array $data): int|string
+    /**
+     * Find a key/keys of max value in the array
+     */
+    public function findKeysOfTheMaxValue(array $data): array
     {
         // extract element key with a max value
-        $maxValue = max($data);
+        // due to https://wiki.php.net/rfc/string_to_number_comparison we cannot just use max() safely to find biggest elemnt
+        $keys = [];
+        $max = 0;
 
-        $key = array_search($maxValue, $data);
+        foreach ($data as $key => $value) {
+            if (!is_int($value)) continue;
 
-        return $key;
+            if ($value > $max) {
+                $max = $value;
+                $keys = [$key];
+            } elseif ($value === $max) {
+                $keys[] = $key;
+            }
+        }
 
+        return $keys;
     }
 }
 
