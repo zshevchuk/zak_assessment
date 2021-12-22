@@ -6,7 +6,6 @@ use App\Lib\FileParser\Contracts\FileParserInterface;
 use App\Lib\FileParser\Abstracts\File;
 use App\Lib\FileParser\LogLine;
 use App\Lib\FileParser\LogDataProcessor;
-use Symfony\Component\Validator\Validation;
 
 class XmlFileParser implements FileParserInterface
 {
@@ -18,7 +17,6 @@ class XmlFileParser implements FileParserInterface
             return false;
         }
 
-//        $validator = Validation::createValidator();
         $atLeastOneIteration = false;
 
         // move to the first <record/> node
@@ -29,8 +27,6 @@ class XmlFileParser implements FileParserInterface
                 $actionType = $this->extractActionType($element);
 
                 $line = new LogLine(timestamp: $element['timestamp'], personId: $personId, bookId: $element['isbn'], actionType: $actionType);
-                $violations = $validator->validate($line);
-//                dump($violations);
 
                 $resultData->iterateOverLine($line);
 
@@ -51,6 +47,4 @@ class XmlFileParser implements FileParserInterface
     {
         return (string)$element['action']->attributes()['type'] ?? null;
     }
-
-
 }
