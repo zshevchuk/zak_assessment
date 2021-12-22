@@ -2,7 +2,7 @@
 
 namespace App\Lib\FileParser\Contracts;
 
-interface Renderer
+interface RendererInterface
 {
     public function render(array $data);
 }

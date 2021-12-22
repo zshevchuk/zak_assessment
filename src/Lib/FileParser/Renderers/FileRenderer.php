@@ -3,9 +3,9 @@
 namespace App\Lib\FileParser\Renderers;
 
 use App\Lib\FileParser\Abstracts\File;
-use App\Lib\FileParser\Contracts\Renderer;
+use App\Lib\FileParser\Contracts\RendererInterface;
 
-abstract class FileRenderer implements Renderer
+abstract class FileRenderer implements RendererInterface
 {
     protected File $file;
 

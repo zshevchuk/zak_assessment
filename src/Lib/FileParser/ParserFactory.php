@@ -3,11 +3,11 @@
 namespace App\Lib\FileParser;
 
 use App\Lib\FileParser\Abstracts\File;
-use App\Lib\FileParser\Contracts\FileParser;
+use App\Lib\FileParser\Contracts\FileParserInterface;
 
 class ParserFactory
 {
-    public static function create(File $file): FileParser
+    public static function create(File $file): FileParserInterface
     {
         $extension = $file->getExtension();
 

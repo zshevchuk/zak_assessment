@@ -2,12 +2,12 @@
 
 namespace App\Lib\FileParser;
 
-use App\Lib\FileParser\Contracts\DataProcessor;
-use App\Lib\FileParser\Contracts\Line;
-use App\Lib\FileParser\Contracts\LineIterator;
+use App\Lib\FileParser\Contracts\DataProcessorInterface;
+use App\Lib\FileParser\Contracts\LineInterface;
+use App\Lib\FileParser\Contracts\LineIteratorInterface;
 use App\Lib\FileParser\Enums\LogEnum;
 
-class LogDataProcessor implements DataProcessor, LineIterator
+class LogDataProcessor implements DataProcessorInterface, LineIteratorInterface
 {
     public array $peopleHashMap = [];
     public array $booksCheckoutMap = [];
@@ -25,7 +25,7 @@ class LogDataProcessor implements DataProcessor, LineIterator
         return $this->initialized === true;
     }
 
-    public function iterateOverLine(Line $line): void
+    public function iterateOverLine(LineInterface $line): void
     {
         $data = (array)$line;
 

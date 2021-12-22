@@ -2,12 +2,13 @@
 
 namespace App\Lib\FileParser\Parsers;
 
-use App\Lib\FileParser\Contracts\FileParser;
+use App\Lib\FileParser\Contracts\FileParserInterface;
 use App\Lib\FileParser\Abstracts\File;
 use App\Lib\FileParser\LogLine;
 use App\Lib\FileParser\LogDataProcessor;
+use Symfony\Component\Validator\Validation;
 
-class XmlFileParser implements FileParser
+class XmlFileParser implements FileParserInterface
 {
     public function parse(File $file, LogDataProcessor $resultData): bool
     {
@@ -17,17 +18,19 @@ class XmlFileParser implements FileParser
             return false;
         }
 
+//        $validator = Validation::createValidator();
         $atLeastOneIteration = false;
 
         // move to the first <record/> node
         while ($xml->read()) {
-            // now that we're at the right depth, hop to the next <record/> until the end of the tree
             while ($xml->name === 'record') {
                 $element = (array)new \SimpleXMLElement($xml->readOuterXML());
-                $personId = (string)$element['person']->attributes()['id'];
-                $actionType = (string)$element['action']->attributes()['type'];
+                $personId = $this->extractPersonId($element);
+                $actionType = $this->extractActionType($element);
 
                 $line = new LogLine(timestamp: $element['timestamp'], personId: $personId, bookId: $element['isbn'], actionType: $actionType);
+                $violations = $validator->validate($line);
+//                dump($violations);
 
                 $resultData->iterateOverLine($line);
 
@@ -36,8 +39,18 @@ class XmlFileParser implements FileParser
             }
         }
 
-
         return $atLeastOneIteration;
     }
+
+    private function extractPersonId($element): ?int
+    {
+       return (string)$element['person']->attributes()['id'] ?? null;
+    }
+
+    private function extractActionType($element): ?string
+    {
+        return (string)$element['action']->attributes()['type'] ?? null;
+    }
+
 
 }

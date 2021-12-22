@@ -2,4 +2,4 @@
 
 namespace App\Lib\FileParser\Contracts;
 
-interface Line{}
+interface LineInterface{}

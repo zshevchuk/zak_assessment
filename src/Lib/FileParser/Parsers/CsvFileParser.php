@@ -2,12 +2,12 @@
 
 namespace App\Lib\FileParser\Parsers;
 
-use App\Lib\FileParser\Contracts\FileParser;
+use App\Lib\FileParser\Contracts\FileParserInterface;
 use App\Lib\FileParser\Abstracts\File;
 use App\Lib\FileParser\LogLine;
 use App\Lib\FileParser\LogDataProcessor;
 
-class CsvFileParser implements FileParser
+class CsvFileParser implements FileParserInterface
 {
     public function parse(File $file, LogDataProcessor $resultData): bool
     {

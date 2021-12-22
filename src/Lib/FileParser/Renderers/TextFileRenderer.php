@@ -2,9 +2,9 @@
 
 namespace App\Lib\FileParser\Renderers;
 
-use App\Lib\FileParser\Contracts\Renderer;
+use App\Lib\FileParser\Contracts\RendererInterface;
 
-class TextFileRenderer extends FileRenderer implements Renderer
+class TextFileRenderer extends FileRenderer implements RendererInterface
 {
     public function format(array $data): string
     {

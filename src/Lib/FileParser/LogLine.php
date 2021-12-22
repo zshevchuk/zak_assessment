@@ -2,14 +2,35 @@
 
 namespace App\Lib\FileParser;
 
-use App\Lib\FileParser\Contracts\Line;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Lib\FileParser\Contracts\LineInterface;
 
-final class LogLine implements Line
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+/**
+* @Assert\EnableAutoMapping()
+*/
+final class LogLine implements LineInterface
 {
+    /**
+     * @Assert\GreaterThan(50)
+     */
     public int $personId;
+    /**
+     * @Assert\GreaterThan(50)
+     */
     public string $bookId;
+    /**
+     * @Assert\GreaterThan(50)
+     */
     public string $timestamp;
+    /**
+     * @Assert\GreaterThan(50)
+     */
     public string $actionType;
+
 
     public function __construct(string $timestamp, int $personId, string $bookId, string $actionType)
     {
@@ -19,4 +40,11 @@ final class LogLine implements Line
         $this->actionType = $actionType;
     }
 
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint(
+            'bookId',
+            new Assert\Length(['min' => 30])
+        );
+    }
 }

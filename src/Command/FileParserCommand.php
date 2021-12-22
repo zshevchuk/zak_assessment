@@ -1,7 +1,7 @@
 <?php
 namespace App\Command;
 
-use App\Lib\FileParser\Contracts\DataProcessor;
+use App\Lib\FileParser\Contracts\DataProcessorInterface;
 use App\Lib\FileParser\RenderedFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -60,7 +60,7 @@ class FileParserCommand extends Command
     /**
      * Gather information from files and prepare it for render
      */
-    protected function parseInputs(array $inputFilesPaths): DataProcessor
+    protected function parseInputs(array $inputFilesPaths): DataProcessorInterface
     {
         $this->io->section('Parsing input file(s)');
         $resultData = new LogDataProcessor();
