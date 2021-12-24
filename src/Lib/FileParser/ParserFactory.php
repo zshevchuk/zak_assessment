@@ -4,6 +4,8 @@ namespace App\Lib\FileParser;
 
 use App\Lib\FileParser\Abstracts\File;
 use App\Lib\FileParser\Contracts\FileParserInterface;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class ParserFactory
 {
@@ -18,7 +20,7 @@ class ParserFactory
             throw new \RuntimeException($namespaced . ' does not exist');
         }
 
-        return new $namespaced;
+        return new $namespaced( Validation::createValidator());
     }
 }
 

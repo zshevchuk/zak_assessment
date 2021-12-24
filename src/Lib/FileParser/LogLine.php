@@ -3,6 +3,9 @@
 namespace App\Lib\FileParser;
 
 use App\Lib\FileParser\Contracts\LineInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 final class LogLine implements LineInterface
 {
@@ -17,5 +20,13 @@ final class LogLine implements LineInterface
         $this->bookId = $bookId;
         $this->timestamp = strtotime($timestamp);
         $this->actionType = $actionType;
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint(
+            'bookId',
+            new Assert\Length(['min' => 30])
+        );
     }
 }
